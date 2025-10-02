@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Room WebRTC Demo</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <h1>Room WebRTC Demo</h1>
+
+  <div id="controls">
+    <input id="room" placeholder="room name (default)" />
+    <input id="name" placeholder="your name (optional)" />
+    <button id="joinBtn">Join Room</button>
+    <button id="leaveBtn" disabled>Leave</button>
+  </div>
+
+  <div id="videos">
+    <div class="video-box">
+      <h3>Local</h3>
+      <video id="localVideo" autoplay playsinline muted></video>
+    </div>
+    <div id="remotes"></div>
+  </div>
+
+  <div id="log"></div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+body { font-family: Arial, sans-serif; margin: 20px; }
+#videos { display:flex; gap:20px; align-items:flex-start; }
+.video-box { max-width: 480px; }
+video { width: 320px; border-radius:6px; background:#000; }
+#remotes { display:flex; gap:10px; flex-wrap:wrap; }
+#log { white-space:pre-wrap; margin-top:12px; border-top:1px solid #ddd; padding-top:8px; color:#333; max-height:200px; overflow:auto; }
