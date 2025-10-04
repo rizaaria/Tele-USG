@@ -96,9 +96,9 @@ async def main():
     runner = web.AppRunner(app)
     await runner.setup()
 
-    site = web.TCPSite(runner, "127.0.0.1", 8080)
+    site = web.TCPSite(runner, "0.0.0.0", 8080)
     await site.start()
-    logger.info("Server started on http://127.0.0.1:8080")
+    logger.info("Server started on http://0.0.0.0:8080")
 
     tunnel = ngrok.connect(addr=8080, proto="http")
     logger.info("Ngrok public URL: %s", tunnel.public_url)

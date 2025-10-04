@@ -1,10 +1,8 @@
-// static/js/main.js (robust version)
+// static/js/main.js (final version with TURN via Xirsys)
 const logEl = document.getElementById("log");
 function log(...args) {
   console.log(...args);
-  if (logEl) {
-    logEl.textContent += args.join(" ") + "\n";
-  }
+  if (logEl) logEl.textContent += args.join(" ") + "\n";
 }
 
 let ws = null;
@@ -13,7 +11,24 @@ let localStream = null;
 let isJoined = false;
 let room = null;
 
-const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+// ✅ Gunakan STUN/TURN dari Xirsys agar bisa konek lintas jaringan
+const configuration = {
+  iceServers: [
+    { urls: [ "stun:ss-turn2.xirsys.com" ] },
+    {
+      username: "sKXJ-N3SYceFbP40egIYKSolC6jDBVaSSoa7BJViaUOU2jsD-Y8oIwaTn6KdEgS1AAAAAGjhNBNyaXphYXJpYQ==",
+      credential: "64747cd6-a131-11f0-b573-0242ac140004",
+      urls: [
+        "turn:ss-turn2.xirsys.com:80?transport=udp",
+        "turn:ss-turn2.xirsys.com:3478?transport=udp",
+        "turn:ss-turn2.xirsys.com:80?transport=tcp",
+        "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+        "turns:ss-turn2.xirsys.com:443?transport=tcp",
+        "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+      ]
+    }
+  ]
+};
 
 async function listCameras() {
   try {
@@ -52,8 +67,10 @@ async function startLocalStream(deviceId) {
     const localVideo = document.getElementById("localVideo");
     if (localVideo) {
       localVideo.srcObject = localStream;
+      localVideo.muted = true;
+      try { await localVideo.play(); } catch (e) { /* ignore autoplay error */ }
     }
-    log("Local stream started");
+    log("Local stream started (tracks):", localStream.getTracks().map(t=>t.kind).join(","));
   } catch (err) {
     log("getUserMedia error:", err);
     throw err;
@@ -70,16 +87,8 @@ function ensureWs() {
       log("WebSocket constructor error:", e);
       return reject(e);
     }
-    const openHandler = () => {
-      log("WS open");
-      resolve();
-    };
-    const errHandler = (e) => {
-      log("WS error", e);
-      reject(e);
-    };
-    ws.onopen = openHandler;
-    ws.onerror = errHandler;
+    ws.onopen = () => { log("WS open"); resolve(); };
+    ws.onerror = (e) => { log("WS error", e); reject(e); };
     ws.onmessage = async (evt) => {
       try {
         const data = JSON.parse(evt.data);
@@ -100,12 +109,14 @@ async function handleSignaling(data) {
     const peers = data.peers || [];
     log("Peers in room:", peers);
     if (peers.length > 0) {
-      // 1:1 — pick first peer
-      await createOffer(peers[0]);
+      const target = peers[0];
+      setTimeout(() => createOffer(target).catch(e => log("createOffer err:", e)), 300);
     }
   } else if (action === "offer") {
+    log("Received offer from", data.from);
     await handleOffer(data.from, data.sdp, data.type);
   } else if (action === "answer") {
+    log("Received answer from", data.from);
     if (!pc) { log("No pc when answer arrived"); return; }
     await pc.setRemoteDescription({ type: data.type, sdp: data.sdp });
     log("Remote description (answer) set");
@@ -129,29 +140,55 @@ async function handleSignaling(data) {
   }
 }
 
-async function createPeerConnection(targetId) {
-  pc = new RTCPeerConnection(configuration);
-
+function setupPcHandlers(targetId) {
+  if (!pc) return;
   pc.onicecandidate = (evt) => {
     if (evt.candidate && ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ action: "candidate", target: targetId, candidate: evt.candidate }));
-      log("Sent local ICE candidate");
+      log("Sent local ICE candidate:", evt.candidate && evt.candidate.candidate ? evt.candidate.candidate.substring(0,60) + "..." : evt.candidate);
     }
   };
-
+  pc.oniceconnectionstatechange = () => {
+    log("ICE state:", pc.iceConnectionState, "conn state:", pc.connectionState);
+  };
+  pc.onconnectionstatechange = () => {
+    log("PC connectionState:", pc.connectionState);
+  };
   pc.ontrack = (evt) => {
     const remoteVideo = document.getElementById("remoteVideo");
-    if (remoteVideo) remoteVideo.srcObject = evt.streams[0];
-    log("Remote track received");
+    log("ontrack event: streams:", evt.streams.length, "tracks:", evt.streams[0] ? evt.streams[0].getTracks().map(t=>t.kind) : []);
+    if (remoteVideo) {
+      remoteVideo.srcObject = evt.streams[0];
+      remoteVideo.play().then(() => {
+        log("Remote video play succeeded");
+      }).catch((err) => {
+        log("Remote video play failed (autoplay?):", err);
+      });
+    }
   };
+}
+
+async function createPeerConnection(targetId) {
+  pc = new RTCPeerConnection(configuration);
+  setupPcHandlers(targetId);
 
   if (localStream) {
-    localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+    localStream.getTracks().forEach(t => {
+      pc.addTrack(t, localStream);
+      log("Added local track to pc:", t.kind);
+    });
+  } else {
+    log("Warning: localStream is null when creating PC");
   }
   return pc;
 }
 
 async function createOffer(targetId) {
+  if (pc) {
+    log("Warning: pc already exists; closing and recreating");
+    pc.close();
+    pc = null;
+  }
   await createPeerConnection(targetId);
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);
@@ -160,6 +197,11 @@ async function createOffer(targetId) {
 }
 
 async function handleOffer(fromId, sdp, type) {
+  if (pc) {
+    log("Warning: pc exists when handling offer; closing and recreating");
+    pc.close();
+    pc = null;
+  }
   await createPeerConnection(fromId);
   await pc.setRemoteDescription({ type: type, sdp: sdp });
   const answer = await pc.createAnswer();
@@ -171,7 +213,6 @@ async function handleOffer(fromId, sdp, type) {
 async function joinRoom() {
   if (isJoined) return;
 
-  // defensive: fetch DOM elements at call time
   const roomInput = document.getElementById("room");
   const cameraSelect = document.getElementById("cameraSelect");
   const joinBtn = document.getElementById("joinBtn");
@@ -230,19 +271,16 @@ function leaveRoom() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-  // grab UI elements
   const refreshCamsBtn = document.getElementById("refreshCams");
   const joinBtn = document.getElementById("joinBtn");
   const leaveBtn = document.getElementById("leaveBtn");
 
-  // safety: if elements missing, stop
   if (!document.getElementById("room") || !document.getElementById("cameraSelect") ||
       !document.getElementById("localVideo") || !document.getElementById("remoteVideo")) {
     log("ERROR: one or more UI elements missing. Ensure index.html contains #room, #cameraSelect, #localVideo, #remoteVideo.");
     return;
   }
 
-  // disable join until cameras enumerated
   if (joinBtn) joinBtn.disabled = true;
 
   try {
@@ -260,7 +298,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   log("UI ready");
 });
 
-// cleanup on page close
 window.addEventListener("beforeunload", () => {
   if (ws && ws.readyState === WebSocket.OPEN) ws.close();
   if (pc) pc.close();
