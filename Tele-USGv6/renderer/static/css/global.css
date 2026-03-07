@@ -9,11 +9,23 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background: #ffffff;
   color: #000;
+  -webkit-text-size-adjust: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+a {
+  touch-action: manipulation;
 }
 
 /* Buttons */
@@ -56,7 +68,9 @@ body {
 }
 
 /* Input Field */
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: "Poppins", sans-serif;
   outline: none;
 }

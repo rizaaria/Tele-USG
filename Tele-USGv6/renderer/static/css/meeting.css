@@ -846,34 +846,40 @@ body.dash-body {
 
 /* Tablet (768px and below) */
 @media (max-width: 768px) {
+    body.dash-body {
+        overflow: auto;
+        overflow-x: hidden;
+        height: auto;
+    }
+
     .meeting-layout {
         flex-direction: column;
         padding: 10px;
-        gap: 15px;
+        gap: 8px;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
     }
 
     .video-main {
         height: auto;
-        min-height: 300px;
+        min-height: 0;
+        gap: 6px;
+        flex: none;
     }
 
-    .video-side {
-        width: 100%;
-        flex-direction: row;
-        overflow-x: auto;
-        gap: 10px;
+    .video-box {
+        min-height: 220px;
+        aspect-ratio: 16 / 9;
+        flex: none;
     }
 
-    .side-box {
-        min-width: 200px;
-        flex-shrink: 0;
-    }
-
-    .controls-bar {
-        padding: 10px 15px;
-        gap: 10px;
+    .controls {
+        padding: 10px 12px;
+        gap: 8px;
         flex-wrap: wrap;
         justify-content: center;
+        border-radius: 10px;
     }
 
     .icon-btn {
@@ -890,47 +896,134 @@ body.dash-body {
         font-size: 12px;
     }
 
-    .notes-window,
-    .usg-window {
-        width: 95%;
-        max-height: 85vh;
+    .device-popup {
+        left: auto;
+        right: 0;
+        transform: none;
+        min-width: 200px;
+    }
+
+    .video-side {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-x: auto;
+        gap: 10px;
+    }
+
+    .side-box {
+        min-width: 180px;
+        max-height: 160px;
+        flex: 1 1 180px;
+    }
+
+    .chat-box {
+        flex: none;
+        min-height: 250px;
+        max-height: 350px;
+        width: 100%;
+    }
+
+    /* Notes stays inline below side boxes (replaces chat, same as landscape) */
+    .notes-window {
+        width: 100%;
+        flex: none;
+        min-height: 250px;
+        max-height: 400px;
+    }
+
+    /* Caliper body stacks on tablet */
+    .caliper-body {
+        flex-direction: column;
+    }
+
+    .caliper-sidebar {
+        width: 100%;
+        max-height: 35vh;
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .caliper-image-container img,
+    .caliper-image-container canvas {
+        max-height: 40vh;
+    }
+
+    .caliper-modal-content {
+        width: 98%;
+        max-height: 95vh;
     }
 
     .storage-modal-content {
         width: 90%;
         padding: 25px 20px;
     }
+
+    .qos-panel {
+        left: 10px;
+        bottom: 70px;
+        min-width: 180px;
+        font-size: 12px;
+    }
+
+    .recording-indicator {
+        top: 60px;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+/* Landscape phone (short screen height) */
+@media (max-height: 500px) and (orientation: landscape) {
+    body.dash-body {
+        overflow: auto;
+        overflow-x: hidden;
+        height: auto;
+    }
+
+    .meeting-layout {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .video-main {
+        flex: none;
+    }
+
+    .video-box {
+        min-height: 180px;
+        max-height: 50vh;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }
 
 /* Mobile (480px and below) */
 @media (max-width: 480px) {
     .meeting-layout {
-        padding: 8px;
-        gap: 10px;
+        padding: 5px;
+        gap: 5px;
     }
 
-    .video-main {
-        min-height: 250px;
-        border-radius: 15px;
-    }
-
-    .video-side {
-        gap: 8px;
-    }
-
-    .side-box {
-        min-width: 160px;
+    .video-box {
+        min-height: 180px;
         border-radius: 10px;
     }
 
-    .controls-bar {
-        padding: 8px 10px;
+    .controls {
+        padding: 6px 8px;
         gap: 6px;
-        border-radius: 0 0 12px 12px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .icon-btn {
         padding: 8px;
+        flex-shrink: 0;
     }
 
     .ctrl-icon {
@@ -944,13 +1037,66 @@ body.dash-body {
         max-width: 100px;
     }
 
-    .side-tabs button {
+    .device-popup {
+        position: fixed;
+        bottom: auto;
+        top: 50%;
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, -50%) !important;
+        min-width: 250px;
+        z-index: 200;
+    }
+
+    .video-side {
+        gap: 6px;
+    }
+
+    .side-box {
+        min-width: 140px;
+        max-height: 130px;
+        flex: 1 1 140px;
+        border-radius: 10px;
+    }
+
+    .chat-box {
+        min-height: 200px;
+        max-height: 300px;
+        border-radius: 10px;
+    }
+
+    .chat-header {
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: 14px;
+    }
+
+    .chat-message {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    .chat-input {
+        padding: 8px;
+        gap: 6px;
     }
 
     .chat-input textarea {
         font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    /* Notes stays inline on phone (replaces chat, same as landscape) */
+    .notes-window {
+        max-height: 350px;
+    }
+
+    .notes-header {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .notes-body {
+        padding: 12px;
     }
 
     .notes-field input,
@@ -960,11 +1106,66 @@ body.dash-body {
         padding: 8px 10px;
     }
 
-    .notes-window,
+    .notes-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .anatomy-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    /* Caliper phone adjustments */
+    .caliper-header {
+        padding: 12px 16px;
+    }
+
+    .caliper-header h3 {
+        font-size: 15px;
+    }
+
+    .caliper-sidebar {
+        max-height: 40vh;
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .caliper-image-container img,
+    .caliper-image-container canvas {
+        max-height: 35vh;
+    }
+
+    .caliper-tools {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .tool-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .caliper-modal-content {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    /* USG modal phone */
     .usg-window {
-        width: 98%;
-        border-radius: 15px;
-        max-height: 90vh;
+        width: 95%;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .usg-window h4 {
+        font-size: 16px;
+    }
+
+    .usg-window canvas {
+        max-height: 40vh;
     }
 
     .usg-actions {
@@ -972,6 +1173,12 @@ body.dash-body {
         gap: 8px;
     }
 
+    .usg-actions select,
+    .usg-actions button {
+        font-size: 13px;
+    }
+
+    /* Storage modal phone */
     .storage-modal-content {
         padding: 20px 15px;
         border-radius: 16px;
@@ -985,6 +1192,32 @@ body.dash-body {
     .btn-storage-local {
         padding: 12px 18px;
         font-size: 13px;
+    }
+
+    /* QoS panel phone */
+    .qos-panel {
+        left: 5px;
+        right: 5px;
+        bottom: 60px;
+        min-width: auto;
+    }
+
+    .qos-header {
+        font-size: 14px;
+    }
+
+    .qos-row span:first-child {
+        font-size: 12px;
+    }
+
+    .qos-row span:last-child {
+        font-size: 13px;
+    }
+
+    .recording-indicator {
+        top: 55px;
+        font-size: 11px;
+        padding: 5px 10px;
     }
 }
 

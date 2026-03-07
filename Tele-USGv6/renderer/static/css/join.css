@@ -23,7 +23,7 @@ body.dash-body {
     flex-direction: column;
     align-items: center;
     width: 60%;
-    min-width: 500px;
+    min-width: 0;
 }
 
 .video-preview {
@@ -42,7 +42,7 @@ body.dash-body {
 .video-preview video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: none;
     transform: scaleX(-1);
     /* Mirror local camera for natural selfie view */
@@ -283,6 +283,7 @@ body.dash-body {
 
     .video-section {
         width: 100%;
+        min-width: 0;
     }
 
     .join-side {

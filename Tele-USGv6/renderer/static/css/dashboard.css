@@ -251,6 +251,18 @@ body.dash-body {
         font-size: 12px;
     }
 
+    .topbar .brand {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+    .userbar {
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
     .dash-wrapper {
         padding: 20px 10px;
     }
