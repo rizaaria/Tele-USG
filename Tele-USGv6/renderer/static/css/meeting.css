@@ -73,29 +73,34 @@ body.dash-body {
     background: rgba(0, 0, 0, 0.5);
     z-index: 4;
     display: none;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
 }
 
-/* Hide ALL overlay elements when video is playing */
-.video-box:has(video.play) .overlay {
+/* USG active: lock black background, hide overlays, and force GPU compositing layer */
+.video-box.usg-active {
+    background: #000 !important;
+    isolation: isolate;
+}
+
+.video-box.usg-active video {
+    background: #000 !important;
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Identity filter forces consistent rendering pipeline regardless of GPU compositor state */
+    filter: contrast(1) brightness(1);
+}
+
+.video-box.usg-active .overlay {
     display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
 }
 
-.video-box:has(video.play) .overlay.dimmer {
+.video-box.usg-active .overlay.dimmer {
     display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
 }
 
-/* Also hide dimmer via ID */
-#dimmer0 {
-    display: none;
-    visibility: hidden;
-    opacity: 0;
+.video-box.usg-active .placeholder {
+    display: none !important;
 }
 
 .cam-off-icon {
@@ -310,7 +315,8 @@ body.dash-body {
 
 .side-box {
     width: 100%;
-    min-height: 150px;
+    aspect-ratio: 16 / 9;
+    max-height: 200px;
     background: #d9d9d9;
     border-radius: 12px;
     position: relative;

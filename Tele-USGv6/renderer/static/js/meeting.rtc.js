@@ -349,14 +349,9 @@ export function initRTC(ctx) {
             // If sharing USG without peer, still show USG on camera0
             if (share && state.usgSharing && state.usgStream) {
                 cam0.srcObject = state.usgStream;
-                cam0.style.background = "#000"; // Black background for USG
-                if (box0) box0.style.background = "#000"; // Set parent container to black
+                if (box0) box0.classList.add("usg-active");
                 showVideoEl(cam0);
                 if (placeholder0) placeholder0.style.display = "none";
-                // Hide ALL overlay elements when showing USG solo
-                if (dimmer0) dimmer0.style.display = "none";
-                if (camOffIcon0) camOffIcon0.style.display = "none";
-                if (micOffIcon0) micOffIcon0.style.display = "none";
                 if (box2) box2.classList.remove("hidden");
                 hideVideoEl(cam2);
                 if (placeholder2) { placeholder2.style.display = "flex"; placeholder2.textContent = "Menunggu lawan bicara..."; }
@@ -372,25 +367,24 @@ export function initRTC(ctx) {
             // Main = USG, Side = remote camera
             if (state.usgSharing && state.usgStream) {
                 cam0.srcObject = state.usgStream;
-                cam0.style.background = "#000"; // Black background for USG
-                if (box0) box0.style.background = "#000";
+                if (box0) box0.classList.add("usg-active");
                 showVideoEl(cam0);
                 if (placeholder0) placeholder0.style.display = "none";
             } else if (state.remoteUsgStreamLatest) {
                 cam0.srcObject = state.remoteUsgStreamLatest;
-                cam0.style.background = "#000"; // Black background for USG
-                if (box0) box0.style.background = "#000";
+                if (box0) box0.classList.add("usg-active");
                 showVideoEl(cam0);
                 if (placeholder0) placeholder0.style.display = "none";
             } else {
                 hideVideoEl(cam0);
+                if (box0) box0.classList.remove("usg-active");
                 if (placeholder0) { placeholder0.style.display = "flex"; placeholder0.textContent = "Mengirim USG..."; }
             }
 
             // Show remote camera in box2
             if (box2) box2.classList.remove("hidden");
             cam2.srcObject = state.remoteStreamLatest || null;
-            if (state.remoteStreamLatest) {
+            if (state.remoteStreamLatest && state.remoteCamOn) {
                 showVideoEl(cam2);
                 if (placeholder2) placeholder2.style.display = "none";
             } else {
@@ -407,18 +401,17 @@ export function initRTC(ctx) {
 
         // Normal layout: Main = remote camera
         cam0.srcObject = state.remoteStreamLatest || null;
-        cam0.style.background = "#d9d9d9"; // Reset to default grey for normal camera
-        if (box0) box0.style.background = "#d9d9d9"; // Reset parent container
-        if (state.remoteStreamLatest) {
+        if (box0) box0.classList.remove("usg-active"); // Remove USG styling
+        if (state.remoteStreamLatest && state.remoteCamOn) {
             showVideoEl(cam0);
             if (placeholder0) placeholder0.style.display = "none";
-            if (camOffIcon0) camOffIcon0.style.display = state.remoteCamOn ? "none" : "block";
+            if (camOffIcon0) camOffIcon0.style.display = "none";
             if (micOffIcon0) micOffIcon0.style.display = state.remoteMicOn ? "none" : "block";
-        } else if (state.peerId && !state.remoteCamOn) {
-            // Peer connected but camera is off - show camera off icon instead of waiting message
+        } else if (state.peerId) {
+            // Peer connected but camera is off - show placeholder with off-cam icon
             hideVideoEl(cam0);
             if (placeholder0) { placeholder0.style.display = "flex"; placeholder0.textContent = ""; }
-            if (camOffIcon0) camOffIcon0.style.display = "block";
+            if (camOffIcon0) camOffIcon0.style.display = state.remoteCamOn ? "none" : "block";
             if (micOffIcon0) micOffIcon0.style.display = state.remoteMicOn ? "none" : "block";
         } else {
             setWaitingUIForSlot(0);
@@ -660,12 +653,7 @@ export function initRTC(ctx) {
         }
         applyLayout();
 
-        // Ensure ALL overlay elements stay hidden when USG is sharing
-        if (state.usgSharing) {
-            if (dimmer0) dimmer0.style.display = "none";
-            if (camOffIcon0) camOffIcon0.style.display = "none";
-            if (micOffIcon0) micOffIcon0.style.display = "none";
-        }
+        // usg-active class on box0 handles overlay hiding automatically via CSS
     }
 
     function toggleMic() {
