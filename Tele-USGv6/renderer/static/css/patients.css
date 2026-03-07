@@ -1,0 +1,930 @@
+/* =========================================================
+   PATIENTS DATA PAGE
+========================================================= */
+
+body.dash-body {
+    background: #f5f5f5;
+    min-height: 100vh;
+}
+
+.patients-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* Icon classes for buttons and sections */
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.section-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.header-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.inline-icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.source-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.patients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.patients-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.search-box input {
+    padding: 10px 16px;
+    width: 280px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.search-box input:focus {
+    border-color: #5969F2;
+    outline: none;
+}
+
+/* ========= PATIENT LIST ========= */
+.patients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.patient-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: 0.2s;
+}
+
+.patient-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.patient-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+}
+
+.patient-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #666;
+}
+
+.patient-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.diagnosis-preview {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-view {
+    background: #5969F2;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-view:hover {
+    background: #4759d3;
+}
+
+/* Patient actions container */
+.patient-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Delete button */
+.btn-delete {
+    background: #E33434;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-delete:hover {
+    background: #c42727;
+}
+
+.loading-text,
+.no-data,
+.error-text {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 15px;
+}
+
+.error-text {
+    color: #E33434;
+}
+
+/* ========= BATCH ACTION BAR ========= */
+.batch-action-bar {
+    background: #5969F2;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    animation: slide-down 0.2s ease-out;
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.batch-action-bar.hidden {
+    display: none !important;
+}
+
+.batch-select {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.batch-select input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.batch-select label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.selected-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.batch-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-batch-export {
+    background: white;
+    color: #5969F2;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-batch-export:hover {
+    background: #f0f0f0;
+}
+
+.btn-batch-delete {
+    background: #E33434;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-batch-delete:hover {
+    background: #c42727;
+}
+
+.btn-batch-cancel {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-batch-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Patient card checkbox */
+.patient-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.patient-card.batch-mode {
+    cursor: pointer;
+}
+
+.patient-card.selected {
+    background: #f0f4ff;
+    border: 2px solid #5969F2;
+}
+
+/* Batch mode toggle button */
+.btn-batch-mode {
+    background: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-batch-mode:hover {
+    background: #5969F2;
+    color: white;
+}
+
+/* ========= PATIENT MODAL ========= */
+.patient-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.modal-content {
+    background: #ffffff;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    background: #5969F2;
+    color: white;
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 24px 24px 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.modal-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.modal-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* ========= TABS ========= */
+.modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* ========= TABS ========= */
+.modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    background: #f0f0f0;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tab-btn:hover {
+    background: #e0e0e0;
+}
+
+.tab-btn.active {
+    background: #5969F2;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ========= INFO GRID ========= */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.info-section {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.info-section.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+}
+
+.info-row span:first-child {
+    color: #666;
+}
+
+.info-row span:last-child {
+    font-weight: 500;
+    color: #000;
+}
+
+.diagnosis-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+/* ========= MEDIA GALLERY ========= */
+.media-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+/* When no images, make no-media span full width */
+.media-gallery .no-media {
+    grid-column: 1 / -1;
+}
+
+.media-item {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.media-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.media-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.media-date {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 11px;
+    padding: 4px 8px;
+    text-align: center;
+}
+
+/* ========= RECORDINGS LIST ========= */
+.recordings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.recording-item {
+    background: #f5f5f5;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.recording-item video {
+    width: 100%;
+    max-height: 300px;
+    background: #000;
+}
+
+.recording-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.download-btn {
+    background: #5969F2;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.download-btn:hover {
+    background: #4759d3;
+}
+
+.no-media {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+}
+
+/* ========= LIGHTBOX ========= */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 85%;
+    border-radius: 8px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+}
+
+.lightbox-download {
+    position: absolute;
+    bottom: 30px;
+    background: #5969F2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.lightbox-download:hover {
+    background: #4759d3;
+}
+
+/* ========= HIDDEN STATE ========= */
+.lightbox.hidden {
+    display: none !important;
+}
+
+.patient-modal.hidden {
+    display: none !important;
+}
+
+/* ========= DELETE CONFIRMATION MODAL ========= */
+.delete-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 400;
+}
+
+.delete-modal.hidden {
+    display: none !important;
+}
+
+.delete-modal-content {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    animation: modal-pop 0.2s ease-out;
+}
+
+@keyframes modal-pop {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.delete-modal-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.delete-modal-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.delete-modal-content p {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 8px 0;
+}
+
+.delete-warning {
+    color: #E33434 !important;
+    font-size: 13px !important;
+    margin-bottom: 20px !important;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    background: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.btn-confirm-delete {
+    background: #E33434;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-confirm-delete:hover {
+    background: #c42727;
+}
+
+/* ========= MEDIA SOURCE INDICATOR ========= */
+.media-source {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.media-source.cloud {
+    background: rgba(89, 105, 242, 0.9);
+}
+
+.media-source.local {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* ========= RESPONSIVE DESIGN ========= */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+    .patients-container {
+        padding: 20px 15px;
+    }
+
+    .patients-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .patients-header h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+
+    .patients-header .btn,
+    .patients-header .btn-batch-mode {
+        width: 100%;
+        text-align: center;
+    }
+
+    .batch-action-bar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .batch-select {
+        justify-content: center;
+    }
+
+    .batch-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .patient-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .patient-actions {
+        justify-content: flex-end;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        padding: 15px 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 16px;
+        width: 100%;
+    }
+
+    .modal-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+    .patients-container {
+        padding: 15px 10px;
+    }
+
+    .patients-header h2 {
+        font-size: 18px;
+    }
+
+    .search-box input {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .btn-view,
+    .btn-delete {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .patient-info h3 {
+        font-size: 14px;
+    }
+
+    .patient-meta {
+        font-size: 12px;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .modal-header {
+        padding: 12px 15px;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-tabs {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .tab-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+
+    .media-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .lightbox img {
+        max-width: 95%;
+        max-height: 80%;
+    }
+
+    .lightbox-download {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Media source indicator icons */
+.media-source {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+.media-source .source-icon {
+    width: 18px;
+    height: 18px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}

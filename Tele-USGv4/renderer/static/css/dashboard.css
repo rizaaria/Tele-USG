@@ -1,0 +1,116 @@
+/* ======================================
+   DASHBOARD PAGE STYLE
+====================================== */
+
+body.dash-body {
+  background: #ffffff;
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===================== TOP BAR ===================== */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #5969F2;
+  padding: 16px 32px;
+  height: 55px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.topbar .brand {
+  font-weight: 700;
+  font-size: 20px;
+  color: #ffffff;
+}
+
+.userbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.userbar span {
+  font-size: 15px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.btn.small {
+  background: #E33434;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn.small:hover {
+  background: #c72a2a;
+}
+
+/* ===================== MAIN DASHBOARD ===================== */
+
+.dash-container {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.dash-container h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #000;
+}
+
+/* ===================== MENU CARDS ===================== */
+
+.menu-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 45px;
+}
+
+.menu-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* Card Item */
+
+.menu-card {
+  background: #d9d9d9;
+  border-radius: 14px;
+  padding: 24px 25px;
+  width: 240px;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.25s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.menu-card:hover {
+  background: #5969F2;
+  color: #fff;
+  transform: translateY(-6px);
+}
+
+.menu-card h3 {
+  margin: 0;
+  padding: 10px 0;
+  font-weight: 700;
+  font-size: 18px;
+  color: #000;
+}
+
+.menu-card:hover h3 {
+  color: #fff;
+}

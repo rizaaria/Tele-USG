@@ -1,0 +1,76 @@
+{
+  "name": "teleusg-desktop",
+  "version": "6.0.0",
+  "description": "Tele USG",
+  "author": "TeleUSG",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron .",
+    "backend": "node backend/server.js",
+    "build": "electron-builder --win",
+    "build:dir": "electron-builder --win --dir"
+  },
+  "build": {
+    "appId": "com.teleusg.desktop",
+    "productName": "TeleUSG",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "backend/**/*",
+      "renderer/**/*",
+      "python_usg/**/*",
+      ".env",
+      "node_modules/**/*",
+      "!node_modules/.cache/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "python_portable",
+        "to": "python_portable",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TeleUSG",
+      "installerIcon": "build/icon.png",
+      "uninstallerIcon": "build/icon.png"
+    },
+    "asar": false
+  },
+  "dependencies": {
+    "@ngrok/ngrok": "^1.7.0",
+    "cloudinary": "^1.41.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "firebase-admin": "^13.6.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^25.1.8"
+  }
+}

@@ -1,0 +1,94 @@
+/* ============================
+   LOGIN PAGE ONLY
+   ============================ */
+
+.auth-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #FFFFFF;
+    padding: 20px;
+}
+
+.auth-card {
+    background: #D9D9D9;
+    padding: 25px 30px;
+    border-radius: 16px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.auth-card h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.input-group input {
+    width: 100%;
+    padding-right: 40px;
+    background: #fff;
+    border: none;
+    border-radius: 6px;
+}
+
+.pwd-toggle {
+    position: absolute;
+    right: 8px;
+    top: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.eye-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.msg {
+    color: #34E334;
+    font-size: 14px;
+    margin-top: 10px;
+    min-height: 18px;
+}
+
+.btn.primary {
+    width: 100%;
+}
+
+.btn.secondary {
+    width: 100%;
+    margin-top: 6px;
+}
+
+/* Toast icon size */
+.toast-img {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+}
+
+/* ========= RESPONSIVE ========= */
+@media (max-width: 480px) {
+    .auth-body {
+        padding: 15px;
+    }
+
+    .auth-card {
+        padding: 20px 20px;
+    }
+
+    .auth-card h1 {
+        font-size: 26px;
+        margin-bottom: 30px;
+    }
+}

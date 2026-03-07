@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Tele-USG</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="dash-body">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="brand">Tele-USG</div>
+        <div class="userbar">
+            <span id="userName">Loading...</span>
+            <button id="logoutBtn" class="btn small">Logout</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dash-wrapper">
+        <div class="dash-card">
+            <h1 class="page-title">Dashboard</h1>
+
+            <!-- Start Meeting Section -->
+            <div class="section">
+                <h3 class="section-title">Start a Meeting</h3>
+                <div class="card-row">
+                    <div class="menu-card" onclick="goto('create')">
+                        <img src="/static/img/Create Meeting.png" class="card-icon" />
+                        <span>Create Meeting</span>
+                    </div>
+                    <div class="menu-card" onclick="goto('join')">
+                        <img src="/static/img/Join Meeting.png" class="card-icon" />
+                        <span>Join Meeting</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database Section -->
+            <div class="section">
+                <h3 class="section-title">Database</h3>
+                <div class="card-row">
+                    <div class="menu-card" onclick="goto('patients')">
+                        <img src="/static/img/Folder.png" class="card-icon" />
+                        <span>Data Pasien</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remote Access Section -->
+            <div id="ngrokSection" class="section ngrok-section hidden">
+                <h3 class="section-title">Remote Access</h3>
+                <div class="ngrok-url-box">
+                    <span id="ngrokUrl">Loading...</span>
+                    <button id="copyNgrokBtn" class="copy-btn" title="Copy URL">
+                        <img src="/static/img/Copy.png" class="copy-icon" />
+                    </button>
+                </div>
+                <p class="ngrok-hint">Share this URL to access from other devices</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "teleusg-desktop",
+  "version": "1.0.0",
+  "description": "Tele-USG Desktop App (Electron + Express + Python USG)",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron .",
+    "backend": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "firebase-admin": "^13.6.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

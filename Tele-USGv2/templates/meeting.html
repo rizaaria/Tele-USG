@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tele-USG Meeting</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body class="dash-body">
+
+  <!-- 🔹 Top Bar -->
+  <div class="topbar">
+    <div class="brand">Tele-USG</div>
+    <div class="userbar">
+      <span id="roomInfo">Room ID: {{ room_id }}</span>
+      <button id="leaveBtn" class="btn small danger">Leave</button>
+    </div>
+  </div>
+
+  <!-- 🔹 Layout -->
+  <div class="meeting-layout">
+
+    <!-- 🔹 Kamera besar (remote) -->
+  <div class="video-main" id="mainContainer">
+    <div class="video-box" id="box0">
+      <video id="camera0" autoplay playsinline></video>
+      <div class="overlay dimmer" id="dimmer0"></div>
+      <div class="overlay">
+        <img id="camOffIcon0" src="/static/img/Camera off.png" class="cam-off-icon" />
+        <img id="micOffIcon0" src="/static/img/Mic off.png" class="mic-off-icon" />
+      </div>
+      <div class="placeholder" id="placeholder0">Kamera 0</div>
+    </div>
+
+    <div class="controls">
+      <button class="icon-btn" id="toggleMic">
+        <img src="/static/img/Mic.png" class="ctrl-icon" />
+      </button>
+      <button class="icon-btn" id="toggleCam">
+        <img src="/static/img/Icon.png" class="ctrl-icon" />
+      </button>
+      <select id="cameraSelect0" class="camera-select"></select>
+    </div>
+  </div>
+
+  <!-- 🔹 Kamera kecil (local preview) -->
+  <div class="video-side" id="sideContainer">
+    <div class="side-box" id="box1">
+      <video id="camera1" autoplay playsinline muted></video>
+      <div class="overlay">
+        <img id="camOffIcon1" src="/static/img/Camera off.png" class="cam-off-icon" />
+        <img id="micOffIcon1" src="/static/img/Mic off.png" class="mic-off-icon" />
+      </div>
+      <div class="placeholder" id="placeholder1"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/meeting.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Meeting | Tele-USG</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="dash-body">
+
+  <!-- 🔹 Top Bar -->
+  <div class="topbar">
+    <div class="brand">Tele-USG</div>
+    <div class="userbar">
+      <span id="userName">Loading...</span>
+      <button id="logoutBtn" class="btn small">Logout</button>
+    </div>
+  </div>
+
+  <!-- 🔹 Main Layout -->
+  <div class="join-layout">
+    <!-- === Left: Camera Preview === -->
+    <div class="video-section">
+      <div class="video-preview">
+        <video id="cameraPreview" autoplay playsinline></video>
+        <div class="camera-placeholder" id="cameraPlaceholder">Kamera off</div>
+      </div>
+
+      <!-- Controls -->
+      <div class="camera-controls">
+        <button class="icon-btn" id="toggleMic">
+          <img src="/static/img/Mic.png" alt="Mic" class="ctrl-icon" />
+        </button>
+        <button class="icon-btn" id="toggleCam">
+          <img src="/static/img/Icon.png" alt="Camera" class="ctrl-icon" />
+        </button>
+        <select id="cameraSelect" class="camera-select"></select>
+      </div>
+    </div>
+
+    <!-- === Right: Create Panel === -->
+    <div class="join-side">
+      <h3>Create Meeting</h3>
+
+      <!-- Input Room ID + Copy button -->
+      <div class="input-group">
+        <input type="text" id="roomId" readonly />
+        <button type="button" id="copyBtn" class="pwd-toggle" title="Salin Room ID">
+          <img src="/static/img/Copy.png" alt="Salin" class="eye-icon" />
+        </button>
+      </div>
+
+      <button id="createBtn" class="btn primary">Start Meeting</button>
+      <button id="backBtn" class="btn danger">Back</button>
+
+      <p id="createMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/create.js"></script>
+</body>
+</html>

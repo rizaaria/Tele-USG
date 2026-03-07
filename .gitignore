@@ -1,0 +1,26 @@
+# Environment & secrets
+.env
+
+# Dependencies
+**/node_modules/
+
+# Build output & binaries
+**/dist/
+**/build/
+**/python_portable/
+**/savedata/
+
+# Lock files & scripts (optional, per-subfolder)
+**/package-lock.json
+setup-python-portable.bat
+
+# Non-code folders
+Paper/
+Pengujian/
+UI/
+Model AI/
+Code terpisah/
+
+# Large binary files
+*.exe
+*.pyd

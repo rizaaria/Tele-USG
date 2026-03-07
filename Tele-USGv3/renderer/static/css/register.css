@@ -1,0 +1,113 @@
+/* ======================================
+   REGISTER PAGE — hanya style untuk halaman register
+====================================== */
+
+/* Background layout */
+.auth-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #FFFFFF;
+  font-family: "Poppins";
+}
+
+/* Card */
+.auth-card {
+  background: #D9D9D9;
+  padding: 20px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  width: 340px;
+  text-align: center;
+}
+
+.auth-card h1 {
+  font-size: 35px;
+  margin-bottom: 45px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Input Fields */
+.input-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 40px 10px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #FFFFFF;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  border-color: #5969F2;
+  box-shadow: 0 0 4px rgba(89, 105, 242, 0.3);
+}
+
+/* Toggle password */
+.pwd-toggle {
+  position: absolute;
+  right: 8px;
+  top: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.pwd-toggle:hover {
+  opacity: 0.8;
+}
+
+.eye-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn.primary {
+  background: #5969F2;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.btn.primary:hover {
+  background: #4759d3;
+}
+
+.btn.secondary {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ddd;
+  margin-top: 8px;
+}
+
+.btn.secondary:hover {
+  background: #f4f4f4;
+}
+
+/* Message */
+.msg {
+  font-size: 16px;
+  margin-top: 12px;
+  min-height: 18px;
+  color: #34E334;
+}

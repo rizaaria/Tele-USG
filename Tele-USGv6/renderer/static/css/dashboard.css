@@ -1,0 +1,297 @@
+/* ======================================
+   DASHBOARD PAGE STYLE
+====================================== */
+
+body.dash-body {
+    background: #f0f2f5;
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* ===================== TOP BAR ===================== */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #5969F2;
+    padding: 16px 32px;
+    height: 55px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 20px 20px;
+}
+
+.topbar .brand {
+    font-weight: 700;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.userbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.userbar span {
+    font-size: 15px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.btn.small {
+    background: #E33434;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn.small:hover {
+    background: #c72a2a;
+}
+
+/* ===================== DASHBOARD WRAPPER ===================== */
+
+.dash-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.dash-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 50px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #000;
+    text-align: center;
+}
+
+/* ===================== SECTIONS ===================== */
+
+.section {
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+/* ===================== CARD ROW ===================== */
+
+.card-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* ===================== MENU CARDS ===================== */
+
+.menu-card {
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 16px 24px;
+    flex: 1;
+    min-width: 180px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: 0.2s;
+    border: 1px solid #eee;
+}
+
+.menu-card:hover {
+    background: #e8e8e8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+}
+
+.menu-card span {
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+    flex: 1;
+}
+
+/* ===================== NGROK SECTION ===================== */
+
+.ngrok-section {
+    margin-top: 10px;
+}
+
+.ngrok-url-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f5f5f5;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.ngrok-url-box span {
+    flex: 1;
+    font-family: monospace;
+    font-size: 13px;
+    color: #333;
+    word-break: break-all;
+}
+
+.copy-btn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    border-radius: 6px;
+}
+
+.copy-btn:hover {
+    background: #e0e0e0;
+}
+
+.copy-btn .copy-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+}
+
+.ngrok-hint {
+    font-size: 12px;
+    color: #888;
+    margin: 10px 0 0 0;
+}
+
+/* ===================== HIDDEN STATE ===================== */
+
+.hidden {
+    display: none !important;
+}
+
+/* ===================== RESPONSIVE DESIGN ===================== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 12px 20px;
+        height: 50px;
+    }
+
+    .topbar .brand {
+        font-size: 18px;
+    }
+
+    .dash-wrapper {
+        padding: 25px 15px;
+    }
+
+    .dash-card {
+        padding: 30px 25px;
+        border-radius: 16px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+
+    .card-row {
+        flex-direction: column;
+    }
+
+    .menu-card {
+        min-width: 100%;
+    }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+    .topbar {
+        padding: 10px 15px;
+        height: 45px;
+        border-radius: 0 0 15px 15px;
+    }
+
+    .topbar .brand {
+        font-size: 16px;
+    }
+
+    .userbar span {
+        font-size: 13px;
+    }
+
+    .btn.small {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .dash-wrapper {
+        padding: 20px 10px;
+    }
+
+    .dash-card {
+        padding: 25px 20px;
+        border-radius: 14px;
+    }
+
+    .page-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 13px;
+    }
+
+    .menu-card {
+        padding: 14px 18px;
+    }
+
+    .menu-card span {
+        font-size: 14px;
+    }
+
+    .ngrok-url-box {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+    }
+
+    .ngrok-url-box span {
+        font-size: 11px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+/* Toast icon size */
+.toast-img {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Pasien | Tele-USG</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="stylesheet" href="/static/css/patients.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body class="dash-body">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="brand">Tele-USG</div>
+        <div class="userbar">
+            <span id="userName">Loading...</span>
+            <button id="logoutBtn" class="btn small">Logout</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="patients-container">
+        <div class="patients-header">
+            <h2><img src="/static/img/Paper.png" class="header-icon" alt=""> Data Pasien</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari nama pasien..." />
+            </div>
+            <button class="btn-batch-mode" onclick="toggleBatchMode()"><img src="/static/img/Select.png"
+                    class="btn-icon" alt=""> Pilih</button>
+            <button class="btn secondary" onclick="location.href='/dashboard'">← Kembali</button>
+        </div>
+
+        <!-- Batch Action Bar (hidden by default) -->
+        <div class="batch-action-bar hidden" id="batchActionBar">
+            <div class="batch-select">
+                <input type="checkbox" id="selectAllCheckbox" />
+                <label for="selectAllCheckbox">Pilih Semua</label>
+                <span class="selected-count" id="selectedCount">0 dipilih</span>
+            </div>
+            <div class="batch-actions">
+                <button class="btn-batch-export" id="batchExportBtn"><img src="/static/img/Save PDF.png"
+                        class="btn-icon" alt=""> Export PDF</button>
+                <button class="btn-batch-delete" id="batchDeleteBtn"><img src="/static/img/Trashcan.png"
+                        class="btn-icon" alt=""> Hapus</button>
+                <button class="btn-batch-cancel" id="batchCancelBtn">✕ Batal</button>
+            </div>
+        </div>
+
+        <!-- Patient List -->
+        <div class="patients-list" id="patientsList">
+            <p class="loading-text">Memuat data pasien...</p>
+        </div>
+    </div>
+
+    <!-- Patient Detail Modal -->
+    <div id="patientModal" class="patient-modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalPatientName">Detail Pasien</h3>
+                <div class="modal-actions">
+                    <button class="modal-action-btn" id="exportPdfBtn" title="Export PDF"><img
+                            src="/static/img/Save PDF.png" class="btn-icon" alt=""> Export PDF</button>
+                    <button class="modal-close" id="closeModal">✕</button>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="modal-tabs">
+                    <button class="tab-btn active" data-tab="info"><img src="/static/img/Paper.png" class="btn-icon"
+                            alt=""> Info</button>
+                    <button class="tab-btn" data-tab="screenshots"><img src="/static/img/Screenshot Saved File.png"
+                            class="btn-icon" alt=""> Screenshot</button>
+                    <button class="tab-btn" data-tab="recordings"><img src="/static/img/Recording Saved File.png"
+                            class="btn-icon" alt=""> Rekaman</button>
+                </div>
+
+                <!-- Info Tab -->
+                <div class="tab-content active" id="tab-info">
+                    <div class="info-grid" id="patientInfo">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Screenshots Tab -->
+                <div class="tab-content" id="tab-screenshots">
+                    <div class="media-gallery" id="screenshotsGallery">
+                        <p class="no-media">Tidak ada screenshot</p>
+                    </div>
+                </div>
+
+                <!-- Recordings Tab -->
+                <div class="tab-content" id="tab-recordings">
+                    <div class="recordings-list" id="recordingsList">
+                        <p class="no-media">Tidak ada rekaman</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox -->
+    <div id="lightbox" class="lightbox hidden">
+        <button class="lightbox-close">✕</button>
+        <img id="lightboxImg" src="" alt="Screenshot" />
+        <a id="lightboxDownload" class="lightbox-download"><img src="/static/img/Folder.png" class="inline-icon" alt="">
+            Download</a>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="delete-modal hidden">
+        <div class="delete-modal-content">
+            <div class="delete-modal-icon"><img src="/static/img/Trashcan.png" alt="" style="width:48px;height:48px;">
+            </div>
+            <h3>Hapus Data Pasien?</h3>
+            <p id="deleteModalText">Apakah Anda yakin ingin menghapus data pasien ini?</p>
+            <p class="delete-warning"><img src="/static/img/Warning.png" class="inline-icon" alt=""> Semua data termasuk
+                screenshot dan rekaman akan dihapus permanen.</p>
+            <div class="delete-modal-actions">
+                <button id="deleteCancelBtn" class="btn-cancel">Batal</button>
+                <button id="deleteConfirmBtn" class="btn-confirm-delete">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/patients.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

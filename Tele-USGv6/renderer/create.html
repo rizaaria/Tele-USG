@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Meeting | Tele-USG</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/create.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="dash-body">
+    <div class="topbar">
+        <div class="brand">Tele-USG</div>
+        <div class="userbar">
+            <span id="userName">Loading...</span>
+            <button id="logoutBtn" class="btn small">Logout</button>
+        </div>
+    </div>
+
+    <div class="join-layout">
+        <div class="video-section">
+            <div class="video-preview">
+                <video id="cameraPreview" autoplay playsinline></video>
+                <div class="overlay">
+                    <img id="camOffIcon" src="/static/img/Off Cam.png" class="cam-off-icon" />
+                    <img id="micOffIcon" src="/static/img/Off Mic.png" class="mic-off-icon" />
+                </div>
+                <div class="camera-placeholder" id="cameraPlaceholder"></div>
+            </div>
+
+            <div class="camera-controls">
+                <!-- Mic with popup -->
+                <div class="control-group">
+                    <button class="icon-btn" id="toggleMic">
+                        <img src="/static/img/On Mic.png" class="ctrl-icon" />
+                    </button>
+                    <button class="icon-btn-arrow" id="micArrow">▲</button>
+                    <div class="device-popup hidden" id="micPopup">
+                        <div class="popup-title">Select Microphone</div>
+                        <select id="micSelect"></select>
+                    </div>
+                </div>
+                <!-- Cam with popup -->
+                <div class="control-group">
+                    <button class="icon-btn" id="toggleCam">
+                        <img src="/static/img/On Cam.png" class="ctrl-icon" />
+                    </button>
+                    <button class="icon-btn-arrow" id="camArrow">▲</button>
+                    <div class="device-popup hidden" id="camPopup">
+                        <div class="popup-title">Select Camera</div>
+                        <select id="cameraSelect"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="join-side">
+            <h3>Create Meeting</h3>
+
+            <div class="input-group">
+                <input type="text" id="roomId" readonly />
+                <button type="button" id="copyBtn" class="pwd-toggle">
+                    <img src="/static/img/Copy.png" class="eye-icon" />
+                </button>
+            </div>
+
+            <button id="createBtn" class="btn primary">Start Meeting</button>
+            <button id="backBtn" class="btn danger">Back</button>
+            <p id="createMsg" class="msg"></p>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/create.js"></script>
+</body>
+
+</html>

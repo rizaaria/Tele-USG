@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tele-USG Meeting</title>
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <link rel="stylesheet" href="/static/css/meeting.css" />
+</head>
+
+<body class="dash-body">
+
+  <!-- 🔹 Top Bar -->
+  <div class="topbar">
+    <div class="brand">Tele-USG</div>
+
+    <div class="userbar">
+      <span id="roomInfo"></span>
+      <button id="leaveBtn" class="btn small danger">Leave</button>
+    </div>
+  </div>
+
+
+  <!-- ======================================================= -->
+  <!--                   MEETING LAYOUT                        -->
+  <!-- ======================================================= -->
+  <div class="meeting-layout">
+
+    <!-- ======================================================= -->
+    <!--                     KAMERA 0 (MAIN)                      -->
+    <!-- ======================================================= -->
+    <div class="video-main">
+
+      <div class="video-box" id="box0">
+        <video id="camera0" autoplay playsinline></video>
+        <div class="overlay dimmer" id="dimmer0"></div>
+
+        <div class="overlay">
+          <img id="camOffIcon0" src="/static/img/Camera off.png" class="cam-off-icon" />
+          <img id="micOffIcon0" src="/static/img/Mic off.png" class="mic-off-icon" />
+        </div>
+
+        <div class="placeholder" id="placeholder0">Menunggu lawan bicara...</div>
+      </div>
+
+
+      <!-- ===================== CONTROL BAR ====================== -->
+      <div class="controls">
+
+        <button class="icon-btn" id="btnScreenshot" title="Screenshot">
+          <img src="/static/img/Screenshot.png" class="ctrl-icon" />
+        </button>
+
+        <button class="icon-btn" id="btnRecord" title="Record">
+          <img src="/static/img/Record.png" class="ctrl-icon" />
+        </button>
+
+        <button class="icon-btn" id="toggleMic" title="Toggle Microphone">
+          <img src="/static/img/Mic.png" class="ctrl-icon" />
+        </button>
+
+        <button class="icon-btn" id="toggleCam" title="Toggle Camera">
+          <img src="/static/img/Icon.png" class="ctrl-icon" />
+        </button>
+
+        <select id="cameraSelect0" class="camera-select" title="Switch Camera"></select>
+
+        <button class="icon-btn" id="btnShareCam" title="Share USG Camera">
+          <img src="/static/img/Share.png" class="ctrl-icon" />
+        </button>
+
+        <button class="icon-btn" id="btnNotes" title="Notes">
+          <img src="/static/img/Notes.png" class="ctrl-icon" />
+        </button>
+
+      </div>
+    </div>
+
+
+
+    <!-- ======================================================= -->
+    <!--                      SIDE PANEL                          -->
+    <!-- ======================================================= -->
+    <div class="video-side">
+
+      <!-- 🔹 CAMERA 1 -->
+      <div class="side-box" id="box1">
+        <video id="camera1" autoplay playsinline muted></video>
+
+        <div class="overlay">
+          <img id="camOffIcon1" src="/static/img/Camera off.png" class="cam-off-icon" />
+          <img id="micOffIcon1" src="/static/img/Mic off.png" class="mic-off-icon" />
+        </div>
+
+        <div class="placeholder" id="placeholder1"></div>
+      </div>
+
+
+      <!-- 🔹 CAMERA 2 (Hidden until Share USG ON) -->
+      <div class="side-box hidden" id="box2">
+        <video id="camera2" autoplay playsinline></video>
+
+        <div class="overlay">
+          <img id="camOffIcon2" src="/static/img/Camera off.png" class="cam-off-icon" />
+          <img id="micOffIcon2" src="/static/img/Mic off.png" class="mic-off-icon" />
+        </div>
+
+        <div class="placeholder" id="placeholder2"></div>
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!--                        CHAT PANEL                       -->
+      <!-- ======================================================= -->
+      <div class="chat-box" id="chatPanel">
+
+        <div class="chat-header" id="chatHeader">
+          Chat
+          <span class="expand-icon">▲</span>
+        </div>
+
+        <div class="chat-body" id="chatMessages"></div>
+
+        <div class="chat-input">
+          <textarea id="chatText" rows="1" placeholder="Type your message here"></textarea>
+          <button id="chatSend" title="Send">
+            <img src="/static/img/Send.png" class="send-icon" />
+          </button>
+        </div>
+      </div>
+
+
+      <!-- ======================================================= -->
+      <!--                       NOTES WINDOW                       -->
+      <!-- ======================================================= -->
+      <div class="notes-window hidden" id="notesWindow">
+        <div class="notes-header">
+          Notes Dokter
+          <button id="closeNotes" class="close-btn">✕</button>
+        </div>
+
+        <div class="notes-body">
+
+          <!-- TANGGAL OTOMATIS -->
+          <div class="notes-field">
+            <label>Tanggal</label>
+            <input id="notesDate" type="text" readonly>
+          </div>
+
+          <h4>Data Pasien</h4>
+          <div class="notes-field">
+            <label>Nama Pasien</label>
+            <input id="patientNameInput" type="text">
+          </div>
+          <div class="notes-field">
+            <label>Usia Ibu (tahun)</label>
+            <input id="motherAgeInput" type="number">
+          </div>
+          <div class="notes-field">
+            <label>Umur Kehamilan (minggu)</label>
+            <input id="gestAgeInput" type="number">
+          </div>
+
+          <h4>Biometri Janin</h4>
+          <div class="notes-field"><label>BPD (mm)</label><input id="bpdInput" type="number"></div>
+          <div class="notes-field"><label>HC (cm)</label><input id="hcInput" type="number"></div>
+          <div class="notes-field"><label>AC (cm)</label><input id="acInput" type="number"></div>
+          <div class="notes-field"><label>FL (mm)</label><input id="flInput" type="number"></div>
+          <div class="notes-field"><label>EFW (g)</label><input id="efwInput" type="number"></div>
+
+          <h4>Penilaian Anatomi</h4>
+          <textarea id="anatomyInput" rows="2"></textarea>
+
+          <h4>Diagnosis</h4>
+          <textarea id="diagnosisInput" rows="2"></textarea>
+
+          <h4>Rekomendasi</h4>
+          <textarea id="rekomInput" rows="2"></textarea>
+
+          <h4>Catatan Tambahan</h4>
+          <textarea id="additionalInput" rows="3"></textarea>
+
+          </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= SHARE USG POPUP ================= -->
+  <div id="usgModal" class="usg-modal hidden">
+    <div class="usg-window">
+      <h4>Preview USG Camera</h4>
+
+      <canvas id="usgPreview" width="640" height="360"></canvas>
+
+      <div class="usg-actions">
+        <select id="usgCamSelect" class="camera-select"></select>
+        <button id="usgConfirm" class="btn btn-primary">Share</button>
+        <button id="usgCancel" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module" src="/static/js/meeting.main.js"></script>
+
+</body>
+</html>
