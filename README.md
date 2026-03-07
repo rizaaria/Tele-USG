@@ -1,51 +1,60 @@
 # Tele-USG (Medical Internet of Things-Based Tele-Ultrasonography)
 
-**Tele-USG** merupakan sistem telemedicine berbasis arsitektur *Medical Internet of Things (MIoT)* yang dirancang untuk memungkinkan komunikasi dan panduan diagnostik **real-time** antara operator alat USG (misal: di fasilitas kesehatan primer/puskesmas) dan tenaga medis spesialis (misal: di rumah sakit rujukan) melalui jaringan lokal maupun internet (WiFi/4G Cellular).
+**Tele-USG** is a telemedicine system based on the *Medical Internet of Things (MIoT)* architecture designed to enable **real-time** communication and diagnostic guidance between ultrasound operators (e.g., at primary healthcare facilities) and medical specialists (e.g., at referral hospitals) over local networks or the internet (WiFi/4G Cellular).
 
-Aplikasi terpisah dari platform pihak ketiga seperti Zoom/Meet. Sistem ini dibangun dengan protokol **WebRTC (Web Real-Time Communication)** yang menjamin komunikasi asinkron *peer-to-peer* *(P2P)* bervideo latensi rendah dengan enkripsi bawaan.
+The application is independent of third-party platforms like Zoom or Google Meet. This system is built using the **WebRTC (Web Real-Time Communication)** protocol, ensuring low-latency asynchronous *peer-to-peer (P2P)* video communication with built-in encryption.
 
-## Arsitektur Sistem
+## System Architecture
 
-Proyek ini dibangun menggunakan arsitektur MIoT tiga layer yang mengintegrasikan konsep **Edge Computing**:
+This project is built using a three-layer MIoT architecture that integrates **Edge Computing** concepts:
 
-1.  **Perception Layer**: Menggunakan mesin ultrasonografi nyata (Mindray DP-10) dengan *output* VGA. Sinyal video ditangkap menggunakan PC eksternal atau laptop melalui USB Capture Card serta sebuah webcam untuk menampilkan operator USG.
-2.  **Network Layer**: Menggunakan server *signaling* (Firebase) untuk pertukaran Session Description Protocol (SDP) dan negosiasi *Interactive Connectivity Establishment* (ICE) *(STUN/TURN)* untuk keperluan menembus batas jaringan (NAT Traversal). Aliran media (Video/Audio) USG menggunakan komunikasi Peer-to-Peer dari WebRTC. Aplikasi klien juga mempergunakan Websocket untuk menjalankan komunikasi *stream* data secara lokal di Edge Gateway.
-3.  **Application Layer**: Aplikasi interaktif berbasis Desktop (Electron.js) untuk pihak operator dan spesialis yang mendukung pertukaran video berkecepatan tinggi, kontrol sesi jarak jauh, dan memonitor parameter Quality of Service (QoS) seperti Delay, Throughput, Packet Loss, dan Jitter.
+![IoT Architecture](assets/IoT_Architecture.drawio.png)
 
-### Edge Computing di Sisi Operator
-Sistem mengolah video ultrasonografi pada sumber asalnya *(edge gateway)*. Ekstraksi visual pada input VGA dilakukan oleh *Python OpenCV*, sebelum dilakukan pra-pemrosesan mandiri (kompresi JPEG dan *resizing* menjadi 720p pada 20 FPS). Data tersebut dipaketkan lalu diteruskan ke aplikasi Desktop Electron.js melalui server transport lokal (Websocket) sebelum pada akhirnya dipancarkan ke jaringan via WebRTC. Ini meminimalisir delay dan beban *payload* jaringan.
+1.  **Perception Layer**: Utilizes a real ultrasound machine (Mindray DP-10) with VGA output. The video signal is captured using an external PC or laptop via a USB Capture Card, along with a webcam to show the ultrasound operator.
+2.  **Network Layer**: Uses a signaling server (Firebase) for Session Description Protocol (SDP) exchange and *Interactive Connectivity Establishment (ICE)* negotiation (STUN/TURN) to traverse network boundaries (NAT Traversal). Ultrasound media streaming (Video/Audio) utilizes WebRTC Peer-to-Peer communication. The client application also uses WebSockets to handle local data streaming on the Edge Gateway.
+3.  **Application Layer**: An interactive Desktop-based application (Electron.js) for both the operator and the specialist, supporting high-speed video exchange, remote session control, and real-time Quality of Service (QoS) parameter monitoring such as Delay, Throughput, Packet Loss, and Jitter.
+
+### Edge Computing at the Operator Side
+
+![System Design](assets/System_Design.png)
+
+The system processes ultrasound video at its source *(edge gateway)*. Visual extraction from the VGA input is performed by *Python OpenCV*, followed by standalone pre-processing (JPEG compression and resizing to 720p at 20 FPS). The data is packaged and forwarded to the Electron.js Desktop application via a local transport server (WebSocket) before finally being transmitted over the network via WebRTC. This minimizes delay and network payload load.
+
+![Operator Interface](assets/1.png)
 
 ---
 
-## Riwayat Pengembangan (Changelog)
+## Development History (Changelog)
 
-Aplikasi Tele-USG telah dikembangkan secara bertahap demi mencapai efisiensi komunikasi *telemedicine* yang optimal. Berikut adalah evolusi dari proyek ini:
+The Tele-USG application has been developed iteratively to achieve optimal telemedicine communication efficiency. Here is the evolution of this project:
 
 ### v1 (Concept & Prototyping Phase)
-- Implementasi awal pengumpulan (*capture*) citra ultrasonografi memanfaatkan skrip terpisah Python (`OpenCV`).
-- Prototipe awal penerapan koneksi *Peer-to-Peer* (P2P) WebRTC dengan modul `aiortc` di lingkungan Python.
-- Uji coba pensignalan awal memanfaatkan server *cloud* dari Firebase.
-- Pengenalan dasar Model AI untuk integrasi riset di waktu mendatang.
+- Initial implementation of ultrasound image capture using a separate Python script (`OpenCV`).
+- Early prototype of WebRTC *Peer-to-Peer* (P2P) connection implementation using the `aiortc` module in a Python environment.
+- Initial signaling trials utilizing a cloud server from Firebase.
+- Basic introduction of AI Models for future research integration.
 
 ### v2 (Web-Based Tele-USG Server)
-- Transisi membentuk sebuah sistem utuh berbasis Web Interface terintegrasi.
-- Menggunakan **Flask (Python)** sebagai Web Server (men-serving HTML, JS) untuk komunikasi *real-time*.
-- Konektivitas *socket* awal diletakkan pada fondasi ini sebagai aplikasi yang siap dijalankan secara lokal/terdistribusi antar jaringan.
+- Transitioned to form a complete, integrated Web Interface-based system.
+- Used **Flask (Python)** as the Web Server (serving HTML, JS) for *real-time* communication.
+- Initial socket connectivity was laid on this foundation as a locally executable or network-distributed application.
 
-### v3 (Transisi Pertama ke Desktop App)
-- Pengadopsian teknologi aplikasi desktop modern menggunakan **ElectronJS** dan **Express** (Node.js) sebagai backend UI lokal.
-- Pemrosesan Capture USG VGA tetap ditangani oleh Python yang berjalan sebagai proses asinkron pendukung (`python_usg`).
-- Mulai dirancangnya antarmuka grafis yang ramah pengguna untuk pengguna Desktop (*Operator / Spesialis*).
+### v3 (First Transition to Desktop App)
+- Adopted modern desktop application technology using **ElectronJS** and **Express** (Node.js) as the local UI backend.
+- VGA Ultrasound capture processing remains handled by Python running as an asynchronous support process (`python_usg`).
+- Began designing a user-friendly graphical interface for Desktop users (*Operator / Specialist*).
 
 ### v4 & v5 (Desktop App Enhancement & Refinements)
-- **v4**: Perombakan dan pembagian ulang pada susunan proses `renderer` ElectronJS. Implementasi struktur file sistem pengguna, *styling* tingkat lanjut, beserta peningkatan UI/UX guna menyokong kenyamanan diagnostik.
-- **v5**: Penambahan fungsionalitas UI secara drastis serta pra-persiapan modifikasi file untuk memasukki masa pembangunan kompilasi produksi (*production release build*). Stabilisasi transmisi antara proses NodeJS dan Python Websocket lokal.
+- **v4**: Overhaul and redistribution of the ElectronJS `renderer` processes. Implemented a user file system structure, advanced styling, and UI/UX improvements to support diagnostic comfort.
+- **v5**: Drastic addition of UI functionality and pre-preparation of files for production release build. Stabilized transmission between NodeJS processes and local Python WebSockets.
 
 ### v6 (Final Release - Full Desktop & Advanced Features)
-- **Produksi Aplikasi Mandiri**: Pembangunan instalator `.exe` untuk *environment* Windows menggunakan `electron-builder`.
-- **Portabilitas Optimal**: Ditambahkannya integrasi `python_portable`, agar PC pengguna akhir dapat langsung menjalankan penangkap USG Python *embedded* tanpa membutuhkan instalasi Python manual dari awal.
-- **Advanced Network Features**: Integrasi otomatis *Tunneling* menggunakan `ngrok` untuk membuat jembatan aman HTTP tanpa *port forwarding* lokal manual, dipadukan pada komunikasi Firebase RTC. Tersedia juga integrasi Cloud Storage (`cloudinary` dan Firebase Storage) untuk skenario penyimpanan data/riwayat gambar pasien.
-- **Caliper Measurement Tool**: Implementasi fitur klinis *Canvas Drawing*, yang mengizinkan pihak dokter spesialis untuk mengambil gambar *freeze* USG dan melakukan pengukuran spasial interaktif secara kalibrasi visual persis layaknya alat USG asli, dikirim kembali lewat *IPC handler* menuju ruang obrolan operator.
+- **Standalone App Production**: Built an `.exe` installer for Windows environments using `electron-builder`.
+- **Optimal Portability**: Added `python_portable` integration, allowing end-users' PCs to directly run the embedded Python ultrasound capture without requiring manual Python installation from scratch.
+- **Advanced Network Features**: Automatic *Tunneling* integration using `ngrok` to create secure HTTP bridges without manual local port forwarding, combined with Firebase RTC communication. Also provided Cloud Storage integration (`cloudinary` and Firebase Storage) for patient image history/data storage scenarios.
+- **Caliper Measurement Tool**: Implemented advanced clinical *Canvas Drawing* features, allowing specialists to capture frozen ultrasound images and perform interactive spatial measurements with visual calibration akin to a real ultrasound device, sent back via an *IPC handler* to the operator's chat room.
 
 ---
-*Proyek ini merupakan bagian dari riset Tele-USG di School of Electrical Engineering, Telkom University.*
+*This project is part of The Initial Development of Integrated Add-On Tele-Ultrasonography for Monitoring the Health of Pregnant Women and Fetuses in the Community Health Centers in Indonesia.*
+
+*H. Susanti, S. Setiyadi, D. Puspitasari, F. Alia, and M. R. S. Ramadhan, ”The Initial Development of Integrated Add-On Tele-Ultrasonography for Monitoring the Health of Pregnant Women and Fetuses in the Community Health Centers in Indonesia: -,” J. Eng. Technol. Sci., vol. 57, no. 6, pp. 859-874, Nov. 2025.*
