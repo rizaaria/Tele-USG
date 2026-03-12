@@ -1,7 +1,7 @@
 // meeting.usg.js - Simplified USG Camera Sharing
 export function initUSG(ctx) {
     const { elements, state } = ctx;
-    const { btnShareCam, usgModal, usgConfirm, usgCancel, usgCamSelect, usgCanvas, usgCtx } = elements;
+    const { btnShareCam, usgModal, usgConfirm, usgCancel, usgCamSelect, usgCanvas, usgCtx, aiModelSelect } = elements;
 
     // Draw status text on canvas
     function drawCanvasStatus(text) {
@@ -126,6 +126,14 @@ export function initUSG(ctx) {
         state.usgSharing = true;
         const idx = Number(usgCamSelect?.value ?? 0);
 
+        // Send AI model selection to Python backend
+        const aiMode = aiModelSelect?.value || "none";
+        try {
+            if (state.usgWS && state.usgWS.readyState === WebSocket.OPEN) {
+                state.usgWS.send(JSON.stringify({ action: "set-ai-model", mode: aiMode }));
+            }
+        } catch { }
+
         // Tell Python to start streaming
         try {
             if (state.usgWS && state.usgWS.readyState === WebSocket.OPEN) {
@@ -214,9 +222,10 @@ export function initUSG(ctx) {
             }
         } catch { }
 
-        // Tell Python to stop
+        // Tell Python to stop and reset AI model
         try {
             if (state.usgWS && state.usgWS.readyState === WebSocket.OPEN) {
+                state.usgWS.send(JSON.stringify({ action: "set-ai-model", mode: "none" }));
                 state.usgWS.send(JSON.stringify({ action: "stop-share" }));
             }
         } catch { }
@@ -254,6 +263,15 @@ export function initUSG(ctx) {
             try { state.usgWS.send(JSON.stringify({ action: "preview-camera", index: idx })); } catch { }
             drawCanvasStatus("Mengganti kamera...");
             armWatchdog();
+        });
+    }
+
+    // AI model change handler: send selection to Python in real-time
+    if (aiModelSelect) {
+        aiModelSelect.addEventListener("change", () => {
+            if (!state.usgWS || state.usgWS.readyState !== WebSocket.OPEN) return;
+            const mode = aiModelSelect.value;
+            try { state.usgWS.send(JSON.stringify({ action: "set-ai-model", mode })); } catch { }
         });
     }
 

@@ -273,6 +273,11 @@
             <canvas id="usgPreview" width="640" height="360"></canvas>
             <div class="usg-actions">
                 <select id="usgCamSelect" class="camera-select"></select>
+                <select id="aiModelSelect" class="camera-select hidden" title="AI Enhancement">
+                    <option value="none">No Enhancement</option>
+                    <option value="dncnn">DnCNN (Denoise)</option>
+                    <option value="vres">VRES (Super-Resolution)</option>
+                </select>
                 <button id="usgConfirm" class="btn btn-primary">Share</button>
                 <button id="usgCancel" class="btn btn-secondary">Cancel</button>
             </div>

@@ -13,9 +13,9 @@ export function initRTC(ctx) {
     function setWaitingUIForSlot(slot) {
         if (slot === 0) {
             hideVideoEl(cam0);
-            // Reset backgrounds to default
-            if (cam0) cam0.style.background = "";
-            if (box0) box0.style.background = "";
+            // Clear stream source and reset backgrounds to default
+            if (cam0) { cam0.srcObject = null; cam0.style.background = ""; }
+            if (box0) { box0.style.background = ""; box0.classList.remove("usg-active"); }
             if (placeholder0) { placeholder0.style.display = "flex"; placeholder0.textContent = "Menunggu lawan bicara..."; }
             if (camOffIcon0) camOffIcon0.style.display = "none";
             if (micOffIcon0) micOffIcon0.style.display = "none";

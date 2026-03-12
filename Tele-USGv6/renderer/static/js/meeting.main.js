@@ -62,6 +62,7 @@ const elements = {
     usgCanvas: document.getElementById("usgPreview"),
     recordingIndicator: document.getElementById("recordingIndicator"),
     remoteAudio: document.getElementById("remoteAudio"),
+    aiModelSelect: document.getElementById("aiModelSelect"),
 };
 elements.usgCtx = elements.usgCanvas ? elements.usgCanvas.getContext("2d") : null;
 
@@ -151,6 +152,10 @@ const isAdmin = sessionStorage.getItem("devMode") === "true";
 const btnQoS = document.getElementById("btnQoS");
 if (isAdmin && btnQoS) {
     btnQoS.classList.remove("hidden");
+}
+// Show AI Enhancement dropdown for admin only
+if (isAdmin && elements.aiModelSelect) {
+    elements.aiModelSelect.classList.remove("hidden");
 }
 
 // Initialize button icons based on saved state
