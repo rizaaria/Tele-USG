@@ -94,9 +94,16 @@ VRES_FRAME_BUFFER = []  # Buffer for VRES 5-frame temporal input
 VRES_SCALE = 3  # Downscale factor for VRES
 
 def get_model_dir():
-    """Get the Model AI directory path"""
-    # Go up from python_usg/ to Tele-USG/ then into Model AI/
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    """Get the Model AI directory path (works in both dev and packaged mode)"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Primary: models/ folder inside python_usg/ (bundled with app)
+    local_models = os.path.join(script_dir, "models")
+    if os.path.isdir(local_models):
+        return local_models
+
+    # Fallback: ../../Model AI/ (dev mode only)
+    base = os.path.dirname(os.path.dirname(script_dir))
     model_dir = os.path.join(base, "Model AI")
     return model_dir
 

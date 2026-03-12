@@ -9,7 +9,9 @@
     "start": "electron .",
     "backend": "node backend/server.js",
     "build": "electron-builder --win",
-    "build:dir": "electron-builder --win --dir"
+    "build:dir": "electron-builder --win --dir",
+    "build:ai": "electron-builder --win -c.extraResources.0.from=python_portable -c.extraResources.0.to=python_portable",
+    "build:ai:dir": "electron-builder --win --dir -c.extraResources.0.from=python_portable -c.extraResources.0.to=python_portable"
   },
   "build": {
     "appId": "com.teleusg.desktop",
