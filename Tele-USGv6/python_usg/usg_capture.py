@@ -88,10 +88,21 @@ if TORCH_AVAILABLE:
 
 # AI state
 AI_MODEL = None
-AI_MODE = "none"  # "none" | "dncnn" | "vres"
-AI_DEVICE = "cpu"
+AI_DNCNN_MODEL = None  # For full pipeline mode
+AI_VRES_MODEL = None   # For full pipeline mode
+AI_MODE = "none"  # "none" | "clahe" | "dncnn" | "vres" | "full"
+AI_DEVICE = "cuda" if TORCH_AVAILABLE and torch.cuda.is_available() else "cpu"
 VRES_FRAME_BUFFER = []  # Buffer for VRES 5-frame temporal input
 VRES_SCALE = 3  # Downscale factor for VRES
+CLAHE_CLIP_LIMIT = 2.0
+CLAHE_TILE_GRID = (8, 8)
+# Performance tuning: GPU doesn't need these optimizations
+AI_PROCESS_SCALE = 1.0 if AI_DEVICE == "cuda" else 0.5   # Downscale before AI (CPU only)
+AI_FRAME_SKIP = 1 if AI_DEVICE == "cuda" else 3           # Frame skip (CPU only)
+_ai_frame_counter = 0
+_ai_last_enhanced = None
+if TORCH_AVAILABLE:
+    logging.info(f"\U0001f9e0 AI device: {AI_DEVICE.upper()}" + (f" ({torch.cuda.get_device_name(0)})" if AI_DEVICE == "cuda" else " (frame_skip={}, scale={})".format(AI_FRAME_SKIP, AI_PROCESS_SCALE)))
 
 def get_model_dir():
     """Get the Model AI directory path (works in both dev and packaged mode)"""
@@ -107,181 +118,218 @@ def get_model_dir():
     model_dir = os.path.join(base, "Model AI")
     return model_dir
 
-def _remap_dncnn_keys(state_dict):
-    """
-    Remap DnCNN state_dict keys from KAIR format (model.X.weight)
-    to internal format (dncnn.X.weight). Also handles bias mismatch.
-    """
-    model_keys = DnCNN(channels=1, num_of_layers=17).state_dict()
-    remapped = {}
-
-    for key, value in state_dict.items():
-        if key in model_keys and model_keys[key].shape == value.shape:
-            remapped[key] = value
-        else:
-            new_key = key.replace("model.", "dncnn.", 1)
-            if new_key in model_keys and model_keys[new_key].shape == value.shape:
-                remapped[new_key] = value
-
-    return remapped
-
-
 def load_ai_model(mode):
-    """Load AI model by mode name"""
-    global AI_MODEL, AI_MODE, VRES_FRAME_BUFFER
-
-    if not TORCH_AVAILABLE:
-        logging.error("❌ PyTorch not available")
-        AI_MODE = "none"
-        AI_MODEL = None
-        return False
+    """Load AI model by mode name from unified model file"""
+    global AI_MODEL, AI_DNCNN_MODEL, AI_VRES_MODEL, AI_MODE, VRES_FRAME_BUFFER
 
     if mode == "none" or not mode:
         AI_MODEL = None
+        AI_DNCNN_MODEL = None
+        AI_VRES_MODEL = None
         AI_MODE = "none"
         VRES_FRAME_BUFFER = []
-        logging.info("🧠 AI model disabled")
+        logging.info("\U0001f9e0 AI model disabled")
         return True
 
-    model_dir = get_model_dir()
+    if mode == "clahe":
+        # CLAHE uses OpenCV only, no model loading needed
+        AI_MODEL = None
+        AI_DNCNN_MODEL = None
+        AI_VRES_MODEL = None
+        AI_MODE = "clahe"
+        logging.info("\U0001f9e0 CLAHE enhancement enabled (no model needed)")
+        return True
 
-    if mode not in ("dncnn", "vres"):
-        logging.error(f"❌ Unknown AI mode: {mode}")
+    if mode not in ("dncnn", "vres", "full"):
+        logging.error(f"\u274c Unknown AI mode: {mode}")
+        AI_MODE = "none"
+        AI_MODEL = None
+        return False
+
+    if not TORCH_AVAILABLE:
+        logging.error("\u274c PyTorch not available")
+        AI_MODE = "none"
+        AI_MODEL = None
+        return False
+
+    model_dir = get_model_dir()
+    unified_path = os.path.join(model_dir, "usg_unified_model.pth")
+
+    if not os.path.exists(unified_path):
+        logging.error(f"\u274c Unified model not found: {unified_path}")
         AI_MODE = "none"
         AI_MODEL = None
         return False
 
     try:
+        checkpoint = torch.load(unified_path, map_location=AI_DEVICE, weights_only=True)
+
         if mode == "dncnn":
-            filepath = os.path.join(model_dir, "dncnn_gray_blind.pth")
-            if not os.path.exists(filepath):
-                logging.error(f"❌ Model file not found: {filepath}")
-                AI_MODE = "none"
-                AI_MODEL = None
-                return False
-
             model = DnCNN(channels=1, num_of_layers=17)
-            state_dict = torch.load(filepath, map_location=AI_DEVICE, weights_only=True)
-
-            # Remap keys (KAIR format -> internal format)
-            remapped = _remap_dncnn_keys(state_dict)
-            if len(remapped) > 0:
-                model_dict = model.state_dict()
-                model_dict.update(remapped)
-                model.load_state_dict(model_dict)
-                logging.info(f"🧠 DnCNN: {len(remapped)} tensors mapped")
-            else:
-                # Try direct load as fallback
-                model.load_state_dict(state_dict)
-
+            model.load_state_dict(checkpoint['dncnn_state_dict'])
             model.eval()
             model.to(AI_DEVICE)
             AI_MODEL = model
             AI_MODE = mode
-            logging.info(f"🧠 AI model loaded: DnCNN from {filepath}")
+            logging.info(f"\U0001f9e0 AI model loaded: DnCNN from {unified_path}")
             return True
 
         elif mode == "vres":
-            filepath = os.path.join(model_dir, "vres_best_model.pth")
-            if not os.path.exists(filepath):
-                logging.error(f"❌ Model file not found: {filepath}")
-                AI_MODE = "none"
-                AI_MODEL = None
-                return False
-
             model = VRES()
-            checkpoint = torch.load(filepath, map_location=AI_DEVICE, weights_only=False)
-
-            # Handle different checkpoint formats
-            if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
-                model.load_state_dict(checkpoint['model_state_dict'])
-            elif isinstance(checkpoint, dict):
-                model.load_state_dict(checkpoint)
-            else:
-                model = checkpoint
-
+            model.load_state_dict(checkpoint['vres_state_dict'])
             model.eval()
             model.to(AI_DEVICE)
             AI_MODEL = model
             AI_MODE = mode
-            VRES_FRAME_BUFFER = []  # Reset frame buffer
-            logging.info(f"🧠 AI model loaded: VRES from {filepath}")
+            VRES_FRAME_BUFFER = []
+            logging.info(f"\U0001f9e0 AI model loaded: VRES from {unified_path}")
+            return True
+
+        elif mode == "full":
+            # Load both DnCNN and VRES for full pipeline
+            dncnn = DnCNN(channels=1, num_of_layers=17)
+            dncnn.load_state_dict(checkpoint['dncnn_state_dict'])
+            dncnn.eval()
+            dncnn.to(AI_DEVICE)
+            AI_DNCNN_MODEL = dncnn
+
+            vres = VRES()
+            vres.load_state_dict(checkpoint['vres_state_dict'])
+            vres.eval()
+            vres.to(AI_DEVICE)
+            AI_VRES_MODEL = vres
+
+            AI_MODEL = None
+            AI_MODE = "full"
+            VRES_FRAME_BUFFER = []
+            logging.info(f"\U0001f9e0 Full pipeline loaded: CLAHE+DnCNN+VRES from {unified_path}")
             return True
 
     except Exception as e:
-        logging.error(f"❌ Failed to load AI model '{mode}': {e}")
+        logging.error(f"\u274c Failed to load AI model '{mode}': {e}")
         AI_MODEL = None
+        AI_DNCNN_MODEL = None
+        AI_VRES_MODEL = None
         AI_MODE = "none"
         return False
 
-def apply_ai_enhancement(frame):
-    """Apply AI enhancement to a frame. Returns enhanced frame or original on error."""
-    global AI_MODEL, AI_MODE, VRES_FRAME_BUFFER
+def _apply_clahe(frame):
+    """Apply CLAHE contrast enhancement to a frame."""
+    if len(frame.shape) == 3:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = frame
+    clahe = cv2.createCLAHE(clipLimit=CLAHE_CLIP_LIMIT, tileGridSize=CLAHE_TILE_GRID)
+    result = clahe.apply(gray)
+    return cv2.cvtColor(result, cv2.COLOR_GRAY2BGR) if len(frame.shape) == 3 else result
 
-    if AI_MODEL is None or AI_MODE == "none" or not TORCH_AVAILABLE:
+
+def _apply_dncnn(frame, model):
+    """Apply DnCNN denoising to a frame with downscaling for performance."""
+    h, w = frame.shape[:2]
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
+
+    # Downscale for faster processing
+    if AI_PROCESS_SCALE < 1.0:
+        small = cv2.resize(gray, (int(w * AI_PROCESS_SCALE), int(h * AI_PROCESS_SCALE)),
+                           interpolation=cv2.INTER_AREA)
+    else:
+        small = gray
+
+    img_tensor = torch.from_numpy(small.astype(np.float32) / 255.0)
+    img_tensor = img_tensor.unsqueeze(0).unsqueeze(0).to(AI_DEVICE)
+    with torch.no_grad():
+        output = model(img_tensor)
+    output = output.squeeze().cpu().clamp(0, 1).numpy()
+    output = (output * 255).astype(np.uint8)
+
+    # Upscale back to original resolution
+    if AI_PROCESS_SCALE < 1.0:
+        output = cv2.resize(output, (w, h), interpolation=cv2.INTER_LINEAR)
+
+    return cv2.cvtColor(output, cv2.COLOR_GRAY2BGR)
+
+
+def _apply_vres(frame, model):
+    """Apply VRES super-resolution to a frame using temporal buffer."""
+    global VRES_FRAME_BUFFER
+    h, w = frame.shape[:2]
+    scale = VRES_SCALE
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
+
+    # Downscale for faster processing
+    if AI_PROCESS_SCALE < 1.0:
+        proc_h, proc_w = int(h * AI_PROCESS_SCALE), int(w * AI_PROCESS_SCALE)
+        gray_small = cv2.resize(gray, (proc_w, proc_h), interpolation=cv2.INTER_AREA)
+    else:
+        proc_h, proc_w = h, w
+        gray_small = gray
+
+    lr_h, lr_w = proc_h // scale, proc_w // scale
+    lr_frame = cv2.resize(gray_small, (lr_w, lr_h), interpolation=cv2.INTER_CUBIC)
+    lr_upscaled = cv2.resize(lr_frame, (proc_w, proc_h), interpolation=cv2.INTER_CUBIC)
+    lr_normalized = (lr_upscaled.astype(np.float32) / 255.0) - 0.5
+
+    VRES_FRAME_BUFFER.append(lr_normalized)
+    if len(VRES_FRAME_BUFFER) > 5:
+        VRES_FRAME_BUFFER.pop(0)
+    while len(VRES_FRAME_BUFFER) < 5:
+        VRES_FRAME_BUFFER.insert(0, VRES_FRAME_BUFFER[0])
+
+    input_tensor = np.stack(VRES_FRAME_BUFFER, axis=0)
+    input_tensor = torch.from_numpy(input_tensor).float().unsqueeze(0).to(AI_DEVICE)
+    with torch.no_grad():
+        output = model(input_tensor)
+    output = output.squeeze().cpu().numpy()
+    output = (output + 0.5) * 255.0
+    output = np.clip(output, 0, 255).astype(np.uint8)
+
+    # Upscale back to original resolution
+    if AI_PROCESS_SCALE < 1.0:
+        output = cv2.resize(output, (w, h), interpolation=cv2.INTER_LINEAR)
+
+    return cv2.cvtColor(output, cv2.COLOR_GRAY2BGR)
+
+
+def apply_ai_enhancement(frame):
+    """Apply AI enhancement with frame skipping for performance."""
+    global AI_MODEL, AI_MODE, VRES_FRAME_BUFFER, _ai_frame_counter, _ai_last_enhanced
+
+    if AI_MODE == "none":
         return frame
 
+    # Frame skipping: reuse last enhanced frame for non-AI frames
+    _ai_frame_counter += 1
+    if AI_MODE in ("dncnn", "vres", "full") and _ai_frame_counter % AI_FRAME_SKIP != 0:
+        if _ai_last_enhanced is not None:
+            return _ai_last_enhanced
+        # No cached frame yet, process this one
+
     try:
-        if AI_MODE == "dncnn":
-            # DnCNN: grayscale denoising
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            # Normalize to [0,1] and convert to tensor
-            img_tensor = torch.from_numpy(gray.astype(np.float32) / 255.0)
-            img_tensor = img_tensor.unsqueeze(0).unsqueeze(0).to(AI_DEVICE)  # [1,1,H,W]
+        if AI_MODE == "clahe":
+            frame = _apply_clahe(frame)
 
-            with torch.no_grad():
-                output = AI_MODEL(img_tensor)
-
-            # Convert back to numpy
-            output = output.squeeze().cpu().clamp(0, 1).numpy()
-            output = (output * 255).astype(np.uint8)
-            # Merge back to BGR (3-channel grayscale)
-            frame = cv2.cvtColor(output, cv2.COLOR_GRAY2BGR)
+        elif AI_MODE == "dncnn":
+            if AI_MODEL is not None and TORCH_AVAILABLE:
+                frame = _apply_dncnn(frame, AI_MODEL)
 
         elif AI_MODE == "vres":
-            # VRES: 5-frame temporal grayscale super-resolution
-            h, w = frame.shape[:2]
-            scale = VRES_SCALE
+            if AI_MODEL is not None and TORCH_AVAILABLE:
+                frame = _apply_vres(frame, AI_MODEL)
 
-            # Convert to grayscale
-            if len(frame.shape) == 3:
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            else:
-                gray = frame
+        elif AI_MODE == "full":
+            # Full pipeline: CLAHE -> DnCNN -> VRES
+            frame = _apply_clahe(frame)
+            if TORCH_AVAILABLE:
+                if AI_DNCNN_MODEL is not None:
+                    frame = _apply_dncnn(frame, AI_DNCNN_MODEL)
+                if AI_VRES_MODEL is not None:
+                    frame = _apply_vres(frame, AI_VRES_MODEL)
 
-            # Downscale then upscale to create LR input, normalize to [-0.5, 0.5]
-            lr_h, lr_w = h // scale, w // scale
-            lr_frame = cv2.resize(gray, (lr_w, lr_h), interpolation=cv2.INTER_CUBIC)
-            lr_upscaled = cv2.resize(lr_frame, (w, h), interpolation=cv2.INTER_CUBIC)
-            lr_normalized = (lr_upscaled.astype(np.float32) / 255.0) - 0.5
-
-            # Maintain 5-frame temporal buffer
-            VRES_FRAME_BUFFER.append(lr_normalized)
-            if len(VRES_FRAME_BUFFER) > 5:
-                VRES_FRAME_BUFFER.pop(0)
-
-            # Pad buffer if less than 5 frames
-            while len(VRES_FRAME_BUFFER) < 5:
-                VRES_FRAME_BUFFER.insert(0, VRES_FRAME_BUFFER[0])
-
-            # Build 5-frame temporal input [1, 5, H, W]
-            input_tensor = np.stack(VRES_FRAME_BUFFER, axis=0)
-            input_tensor = torch.from_numpy(input_tensor).float()
-            input_tensor = input_tensor.unsqueeze(0).to(AI_DEVICE)
-
-            with torch.no_grad():
-                output = AI_MODEL(input_tensor)
-
-            # Post-process: denormalize
-            output = output.squeeze().cpu().numpy()
-            output = (output + 0.5) * 255.0
-            output = np.clip(output, 0, 255).astype(np.uint8)
-
-            # Convert back to BGR
-            frame = cv2.cvtColor(output, cv2.COLOR_GRAY2BGR)
+        _ai_last_enhanced = frame
 
     except Exception as e:
-        logging.warning(f"⚠️ AI enhancement failed, using original frame: {e}")
+        logging.warning(f"\u26a0\ufe0f AI enhancement failed, using original frame: {e}")
 
     return frame
 
@@ -562,7 +610,7 @@ async def stream_loop():
             await asyncio.sleep(0.05)
             continue
 
-        # Apply AI enhancement if active
+        # Apply AI enhancement (with frame skipping + downscaling)
         frame = apply_ai_enhancement(frame)
 
         # Write frame to video if recording
@@ -639,6 +687,7 @@ async def ws_handler(websocket):
                 # Stop recording if active
                 if is_recording:
                     stop_recording()
+                
                 
                 STREAMING = False
                 ACTIVE_CAMERA = None
