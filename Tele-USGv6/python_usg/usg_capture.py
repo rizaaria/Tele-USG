@@ -336,8 +336,8 @@ def apply_ai_enhancement(frame):
 WS_HOST = "127.0.0.1"
 WS_PORT = 9000
 
-WIDTH = 1280
-HEIGHT = 720
+WIDTH = 1024
+HEIGHT = 768
 FPS = 20  # Target streaming FPS
 RECORDING_FPS = 14  # Actual capture rate (calibrated: 10s record = 7s playback @ 20fps)
 
@@ -404,9 +404,9 @@ def open_camera(index: int):
         cap = None
         return False
 
-    # Request high resolution - camera will negotiate to its native/max resolution
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    # Request USG native resolution (4:3) — avoid 16:9 stretching by capture card
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
     cap.set(cv2.CAP_PROP_FPS, FPS)
     
     # Log actual resolution obtained

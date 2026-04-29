@@ -569,9 +569,18 @@ body.dash-body {
 }
 
 .usg-window canvas {
+    display: block;
     background: #000;
     border-radius: 8px;
     margin-bottom: 15px;
+    /* Biarkan JS yang mengontrol dimensi via width/height attribute */
+    /* CSS hanya batasi agar tidak overflow container */
+    max-width: min(90vw, 960px);
+    max-height: 60vh;
+    width: auto;
+    /* ikuti attribute canvas.width */
+    height: auto;
+    /* ikuti attribute canvas.height */
 }
 
 .usg-actions {
@@ -656,7 +665,7 @@ body.dash-body {
     display: none !important;
 }
 
-/* ========= USG MODAL STYLES ========= */
+/* ========= USG MODAL STYLES (responsive) ========= */
 .usg-modal {
     position: fixed;
     inset: 0;
@@ -671,12 +680,14 @@ body.dash-body {
     background: white;
     border-radius: 16px;
     padding: 20px;
-    max-width: 90vw;
+    max-width: min(90vw, 800px);
     max-height: 85vh;
+    width: 90vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .usg-window h4 {
@@ -689,7 +700,8 @@ body.dash-body {
     max-width: 100%;
     max-height: 60vh;
     border-radius: 10px;
-    background: #222;
+    background: #000;
+    display: block;
 }
 
 .usg-actions {

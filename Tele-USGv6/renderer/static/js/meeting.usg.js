@@ -3,6 +3,98 @@ export function initUSG(ctx) {
     const { elements, state } = ctx;
     const { btnShareCam, usgModal, usgConfirm, usgCancel, usgCamSelect, usgCanvas, usgCtx, aiModelSelect } = elements;
 
+    // Region konten USG yang terdeteksi (dalam koordinat frame)
+    // null = belum terdeteksi, akan di-update tiap N frame
+    // Aspek rasio konten terakhir yang terdeteksi dari bitmap
+    let lastContentAspect = null;
+
+    // Dynamically resize canvas to fit available space while preserving source aspect ratio
+    function resizeCanvas() {
+        if (!usgCanvas) return;
+        const aspect = lastContentAspect || (16 / 9); // default 16:9
+        const maxW = Math.min(window.innerWidth * 0.85, 960);
+        const maxH = window.innerHeight * 0.55;
+        let w = maxW;
+        let h = w / aspect;
+        if (h > maxH) { h = maxH; w = h * aspect; }
+        w = Math.round(w); h = Math.round(h);
+        usgCanvas.width = w;
+        usgCanvas.height = h;
+        usgCanvas.style.width = w + "px";
+        usgCanvas.style.height = h + "px";
+    }
+
+    // Deteksi batas konten dari frame dengan mencari baris/kolom non-hitam
+    function detectContentRegion(bitmap) {
+        // Buat offscreen canvas kecil untuk sampling (lebih cepat)
+        const SAMPLE_W = 160;
+        const SAMPLE_H = Math.round(160 * bitmap.height / bitmap.width);
+        const offscreen = new OffscreenCanvas(SAMPLE_W, SAMPLE_H);
+        const ctx2 = offscreen.getContext("2d");
+        ctx2.drawImage(bitmap, 0, 0, SAMPLE_W, SAMPLE_H);
+        const pixels = ctx2.getImageData(0, 0, SAMPLE_W, SAMPLE_H).data;
+
+        const THRESHOLD = 20; // nilai piksel max yang dianggap "hitam"
+
+        function isRowBlack(row) {
+            // Cek beberapa sampel kolom di baris ini
+            for (let x = Math.floor(SAMPLE_W * 0.1); x < SAMPLE_W * 0.9; x += 8) {
+                const i = (row * SAMPLE_W + x) * 4;
+                if (pixels[i] > THRESHOLD || pixels[i + 1] > THRESHOLD || pixels[i + 2] > THRESHOLD) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function isColBlack(col) {
+            for (let y = Math.floor(SAMPLE_H * 0.1); y < SAMPLE_H * 0.9; y += 8) {
+                const i = (y * SAMPLE_W + col) * 4;
+                if (pixels[i] > THRESHOLD || pixels[i + 1] > THRESHOLD || pixels[i + 2] > THRESHOLD) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Cari batas atas
+        let top = 0;
+        while (top < SAMPLE_H / 2 && isRowBlack(top)) top++;
+
+        // Cari batas bawah
+        let bottom = SAMPLE_H - 1;
+        while (bottom > SAMPLE_H / 2 && isRowBlack(bottom)) bottom--;
+
+        // Cari batas kiri
+        let left = 0;
+        while (left < SAMPLE_W / 2 && isColBlack(left)) left++;
+
+        // Cari batas kanan
+        let right = SAMPLE_W - 1;
+        while (right > SAMPLE_W / 2 && isColBlack(right)) right--;
+
+        // Konversi ke koordinat frame asli
+        const scaleX = bitmap.width / SAMPLE_W;
+        const scaleY = bitmap.height / SAMPLE_H;
+
+        const sx = Math.round(left * scaleX);
+        const sy = Math.round(top * scaleY);
+        const sw = Math.round((right - left + 1) * scaleX);
+        const sh = Math.round((bottom - top + 1) * scaleY);
+
+        // Validasi: konten harus minimal 40% dari frame
+        if (sw < bitmap.width * 0.4 || sh < bitmap.height * 0.4) {
+            return null; // deteksi gagal, gunakan full frame
+        }
+
+        return { sx, sy, sw, sh };
+    }
+
+    // Resize on window resize
+    window.addEventListener("resize", () => {
+        if (!usgModal?.classList.contains("hidden")) resizeCanvas();
+    });
+
     // Draw status text on canvas
     function drawCanvasStatus(text) {
         if (!usgCtx || !usgCanvas) return;
@@ -10,7 +102,8 @@ export function initUSG(ctx) {
         usgCtx.fillStyle = "black";
         usgCtx.fillRect(0, 0, usgCanvas.width, usgCanvas.height);
         usgCtx.fillStyle = "white";
-        usgCtx.font = "20px sans-serif";
+        const fontSize = Math.max(14, Math.round(usgCanvas.height / 18));
+        usgCtx.font = `${fontSize}px sans-serif`;
         usgCtx.textAlign = "center";
         usgCtx.textBaseline = "middle";
         usgCtx.fillText(text, usgCanvas.width / 2, usgCanvas.height / 2);
@@ -82,7 +175,19 @@ export function initUSG(ctx) {
             try {
                 const blob = new Blob([evt.data], { type: "image/jpeg" });
                 const bitmap = await createImageBitmap(blob);
+
+                // Ambil aspek rasio langsung dari bitmap
+                const newAspect = bitmap.width / bitmap.height;
+
+                // Update canvas hanya jika aspek rasio berubah signifikan
+                if (!lastContentAspect || Math.abs(newAspect - lastContentAspect) > 0.05) {
+                    lastContentAspect = newAspect;
+                    resizeCanvas();
+                }
+
+                // Gambar penuh, tanpa crop, canvas sudah proporsional
                 usgCtx.drawImage(bitmap, 0, 0, usgCanvas.width, usgCanvas.height);
+
             } catch {
                 drawCanvasStatus("Kamera tidak tersedia");
             }
@@ -95,6 +200,7 @@ export function initUSG(ctx) {
     function openModal() {
         if (!usgModal) return;
         usgModal.classList.remove("hidden");
+        resizeCanvas();
         connectUSGPreview();
     }
 
